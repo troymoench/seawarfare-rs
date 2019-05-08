@@ -9,10 +9,6 @@ use chrono::format::ParseError;
 
 fn main() -> Result<(), ParseError> {
     println!("Hello, world!");
-    let mut a = Location::new(0, 0, 0);
-    a.print();
-    a.x = 1;
-    a.print();
 
     let local = Local::now().naive_local();
     println!("Time format: {}", local.format("%m-%d-%Y %H:%M:%S"));

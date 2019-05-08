@@ -21,18 +21,18 @@ pub struct Location {
     pub x: i64,
     pub y: i64,
     pub z: i64,
-    // atime
+    t: chrono::NaiveDateTime
 }
 
 impl Location {
-    pub fn new(x: i64, y: i64, z: i64) -> Location {
-        Location {x, y, z}
+    pub fn new(x: i64, y: i64, z: i64, t: chrono::NaiveDateTime) -> Location {
+        Location {x, y, z, t}
     }
-    pub fn new2(x: i64, y: i64) -> Location {
-        Location::new(x, y, 0)
+    pub fn new2(x: i64, y: i64, t: chrono::NaiveDateTime) -> Location {
+        Location::new(x, y, 0, t)
     }
     pub fn print(&self) {
-        println!("({}, {}, {})", self.x, self.y, self.z);
+        println!("({}, {}, {}) t: {}", self.x, self.y, self.z, self.t);
     }
     pub fn get_xyz(&self) -> (i64, i64, i64) {
         (self.x, self.y, self.z)
@@ -41,6 +41,25 @@ impl Location {
 
 impl Clone for Location {
     fn clone(&self) -> Location {
-        Location::new(self.x, self.y, self.z)
+        Location::new(self.x, self.y, self.z, self.t)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_location_new() {
+        let t = chrono::NaiveDate::from_ymd(2015, 10, 21).and_hms(17, 2, 0);
+        let l = Location::new(1, 2, 3, t);
+        l.print()
+    }
+
+    #[test]
+    fn test_location_new2() {
+        let t = chrono::NaiveDate::from_ymd(2015, 10, 21).and_hms(17, 2, 0);
+        let l = Location::new2(1, 2, t);
+        l.print()
     }
 }
