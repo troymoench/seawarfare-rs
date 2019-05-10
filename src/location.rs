@@ -47,7 +47,7 @@ impl Clone for Location {
 
 impl Default for Location {
     fn default () -> Location {
-        Location {x: 0, y: 0, z: 0, t: chrono::NaiveDate::from_ymd(2000, 0, 0).and_hms(0, 0, 0)}
+        Location {x: 0, y: 0, z: 0, t: chrono::NaiveDate::from_ymd(2000, 1, 1).and_hms(0, 0, 0)}
     }
 }
 
