@@ -1,6 +1,8 @@
 extern crate seawarfare_rs;
 use seawarfare_rs::location::*;
 use seawarfare_rs::order::*;
+use seawarfare_rs::movable::*;
+
 extern crate chrono;
 use chrono::prelude::*;
 use chrono::Duration;
