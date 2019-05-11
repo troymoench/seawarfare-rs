@@ -71,7 +71,7 @@ pub struct Cruiser {
 }
 
 impl Cruiser {
-    fn new(name: String, id: String, max_speed: f64, max_missles: i64) -> Self {
+    pub fn new(name: String, id: String, max_speed: f64, max_missles: i64) -> Self {
         Cruiser {
             name: name,
             id: id,
@@ -104,7 +104,7 @@ pub struct Carrier {
 }
 
 impl Carrier {
-    fn new(name: String, id: String, max_speed: f64, max_aircraft: i64) -> Self {
+    pub fn new(name: String, id: String, max_speed: f64, max_aircraft: i64) -> Self {
         Carrier {
             name: name,
             id: id,
@@ -141,7 +141,7 @@ pub struct Fighter {
 }
 
 impl Fighter {
-    fn new(name: String, id: String, max_speed: f64, ship_id: Box<Movable>, max_ceiling: f64, max_bombs: i64) -> Self {
+    pub fn new(name: String, id: String, max_speed: f64, ship_id: Box<Movable>, max_ceiling: f64, max_bombs: i64) -> Self {
         Fighter {
             name: name,
             id: id,
