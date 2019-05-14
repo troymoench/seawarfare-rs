@@ -134,14 +134,14 @@ pub struct Fighter {
     max_speed: f64,
     hl: HistoryList,
     is_landing: bool,
-	ship_id: Box<Movable>,
+	ship_id: &'static Movable,
 	max_ceiling: f64,
 	altitude: f64,
 	max_bombs: i64
 }
 
 impl Fighter {
-    pub fn new(name: String, id: String, max_speed: f64, ship_id: Box<Movable>, max_ceiling: f64, max_bombs: i64) -> Self {
+    pub fn new(name: String, id: String, max_speed: f64, ship_id: &'static Movable, max_ceiling: f64, max_bombs: i64) -> Self {
         Fighter {
             name: name,
             id: id,
