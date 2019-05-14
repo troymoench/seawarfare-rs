@@ -1,3 +1,4 @@
+use crate::movable::*;
 
 // class Order {
 // public:
@@ -165,24 +166,24 @@ impl Order for ChangeAircraft {
     // fn execute(&self, Movable*, chrono::NaiveDateTime) -> bool
 }
 
-#[derive(Debug)]
-pub struct LandAircraft {
+// #[derive(Debug)]
+pub struct LandAircraft<'a> {
     id: String,
     extime: chrono::NaiveDateTime,
-    // ship_id: Movable*
+    ship_id: &'a Movable
 }
 
-// impl LandAircraft {
-//     pub fn new(a: chrono::NaiveDateTime, id: String, ship_id: Movable*) -> Self {
-//         LandAircraft {
-//             extime: a,
-//             id: id,
-//             ship_id: ship_id
-//         }
-//     }
-// }
+impl<'a> LandAircraft<'a> {
+    pub fn new(a: chrono::NaiveDateTime, id: String, ship_id: &'a Movable) -> Self {
+        LandAircraft {
+            extime: a,
+            id: id,
+            ship_id: ship_id
+        }
+    }
+}
 
-impl Order for LandAircraft {
+impl<'a> Order for LandAircraft<'a> {
     fn get_id(&self) -> String {
         return self.id.clone()
     }
@@ -224,6 +225,14 @@ mod tests {
     fn test_change_aircraft_new() {
         let atime = chrono::NaiveDate::from_ymd(2015, 11, 21).and_hms(17, 13, 0);
         let a = ChangeAircraft::new(atime, String::from("FA18C_1"), 0.0, 500.0, -1.0);
+        a.print();
+    }
+
+    #[test]
+    fn test_land_aircraft_new() {
+        let atime = chrono::NaiveDate::from_ymd(2015, 11, 21).and_hms(17, 13, 0);
+        let ship = Carrier::new(String::from("USS_Nimitz"), String::from("CVN-68"), 85.0, 50);
+        let a = LandAircraft::new(atime, String::from("FA18C_1"), &ship);
         a.print();
     }
 
