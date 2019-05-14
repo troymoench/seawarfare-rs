@@ -88,6 +88,36 @@ impl Cruiser {
     }
 }
 
+impl Movable for Cruiser {
+    fn get_is_deployed(&self) -> bool {
+        return self.is_deployed;
+    }
+    fn get_was_deployed(&self) -> bool {
+        return self.was_deployed;
+    }
+    fn get_id(&self) -> String {
+        return self.id.clone();
+    }
+    fn get_name(&self) -> String {
+        return self.name.clone();
+    }
+    fn get_location(&self) -> Location {
+        return self.loc.clone();
+    }
+    fn get_history(&self) -> &HistoryList {
+        return &self.hl;
+    }
+    fn deploy(&self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
+        return false;
+    }
+    fn change(&self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
+        return false;
+    }
+    fn update_position(&self, t: chrono::NaiveDateTime) {
+
+    }
+}
+
 #[derive(Debug)]
 pub struct Carrier {
     name: String,
@@ -121,8 +151,38 @@ impl Carrier {
     }
 }
 
+impl Movable for Carrier {
+    fn get_is_deployed(&self) -> bool {
+        return self.is_deployed;
+    }
+    fn get_was_deployed(&self) -> bool {
+        return self.was_deployed;
+    }
+    fn get_id(&self) -> String {
+        return self.id.clone();
+    }
+    fn get_name(&self) -> String {
+        return self.name.clone();
+    }
+    fn get_location(&self) -> Location {
+        return self.loc.clone();
+    }
+    fn get_history(&self) -> &HistoryList {
+        return &self.hl;
+    }
+    fn deploy(&self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
+        return false;
+    }
+    fn change(&self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
+        return false;
+    }
+    fn update_position(&self, t: chrono::NaiveDateTime) {
+
+    }
+}
+
 // #[derive(Debug)]
-pub struct Fighter {
+pub struct Fighter<'a> {
     name: String,
     id: String,
     at: chrono::NaiveDateTime,
@@ -134,14 +194,14 @@ pub struct Fighter {
     max_speed: f64,
     hl: HistoryList,
     is_landing: bool,
-	ship_id: &'static Movable,
+	ship_id: &'a Movable,
 	max_ceiling: f64,
 	altitude: f64,
 	max_bombs: i64
 }
 
-impl Fighter {
-    pub fn new(name: String, id: String, max_speed: f64, ship_id: &'static Movable, max_ceiling: f64, max_bombs: i64) -> Self {
+impl<'a> Fighter<'a> {
+    pub fn new(name: String, id: String, max_speed: f64, ship_id: &'a Movable, max_ceiling: f64, max_bombs: i64) -> Self {
         Fighter {
             name: name,
             id: id,
@@ -162,6 +222,36 @@ impl Fighter {
     }
 }
 
+impl<'a> Movable for Fighter<'a> {
+    fn get_is_deployed(&self) -> bool {
+        return self.is_deployed;
+    }
+    fn get_was_deployed(&self) -> bool {
+        return self.was_deployed;
+    }
+    fn get_id(&self) -> String {
+        return self.id.clone();
+    }
+    fn get_name(&self) -> String {
+        return self.name.clone();
+    }
+    fn get_location(&self) -> Location {
+        return self.loc.clone();
+    }
+    fn get_history(&self) -> &HistoryList {
+        return &self.hl;
+    }
+    fn deploy(&self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
+        return false;
+    }
+    fn change(&self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
+        return false;
+    }
+    fn update_position(&self, t: chrono::NaiveDateTime) {
+
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -169,16 +259,19 @@ mod tests {
     #[test]
     fn test_cruiser_new() {
         let a = Cruiser::new(String::from("Chelsey"), String::from("I264"), 12.0, 30);
+        a.print();
     }
 
     #[test]
     fn test_carrier_new() {
         let a = Carrier::new(String::from("Gertrude"), String::from("P131"), 25.0, 15);
+        a.print();
     }
 
-    // #[test]
-    // fn test_fighter_new() {
-    //     let ship_id = Carrier::new(String::from("Gertrude"), String::from("P131"), 25.0, 15);
-    //     let a = Fighter::new(String::from("Brunhilde"), String::from("G264"), 500.0, Box::new(ship_id), 100000, 20);
-    // }
+    #[test]
+    fn test_fighter_new() {
+        let ship_id = Carrier::new(String::from("Gertrude"), String::from("P131"), 25.0, 15);
+        let a = Fighter::new(String::from("Brunhilde"), String::from("G264"), 500.0, &ship_id, 100000.0, 20);
+        a.print();
+    }
 }
