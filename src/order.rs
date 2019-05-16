@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use crate::movable::*;
 
 // class Order {
@@ -167,14 +168,14 @@ impl Order for ChangeAircraft {
 }
 
 // #[derive(Debug)]
-pub struct LandAircraft<'a> {
+pub struct LandAircraft {
     id: String,
     extime: chrono::NaiveDateTime,
-    ship_id: &'a Movable
+    ship_id: Rc<Movable>
 }
 
-impl<'a> LandAircraft<'a> {
-    pub fn new(a: chrono::NaiveDateTime, id: String, ship_id: &'a Movable) -> Self {
+impl LandAircraft {
+    pub fn new(a: chrono::NaiveDateTime, id: String, ship_id: Rc<Movable>) -> Self {
         LandAircraft {
             extime: a,
             id: id,
@@ -183,7 +184,7 @@ impl<'a> LandAircraft<'a> {
     }
 }
 
-impl<'a> Order for LandAircraft<'a> {
+impl Order for LandAircraft {
     fn get_id(&self) -> String {
         return self.id.clone()
     }
@@ -231,8 +232,8 @@ mod tests {
     #[test]
     fn test_land_aircraft_new() {
         let atime = chrono::NaiveDate::from_ymd(2015, 11, 21).and_hms(17, 13, 0);
-        let ship = Carrier::new(String::from("USS_Nimitz"), String::from("CVN-68"), 85.0, 50);
-        let a = LandAircraft::new(atime, String::from("FA18C_1"), &ship);
+        let ship: Rc<dyn Movable> = Rc::new(Carrier::new(String::from("USS_Nimitz"), String::from("CVN-68"), 85.0, 50));
+        let a = LandAircraft::new(atime, String::from("FA18C_1"), ship);
         a.print();
     }
 

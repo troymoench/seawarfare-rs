@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use crate::location::Location;
 
 // class Movable {
@@ -182,7 +183,7 @@ impl Movable for Carrier {
 }
 
 // #[derive(Debug)]
-pub struct Fighter<'a> {
+pub struct Fighter {
     name: String,
     id: String,
     at: chrono::NaiveDateTime,
@@ -194,14 +195,14 @@ pub struct Fighter<'a> {
     max_speed: f64,
     hl: HistoryList,
     is_landing: bool,
-	ship_id: &'a Movable,
+	ship_id: Rc<Movable>,
 	max_ceiling: f64,
 	altitude: f64,
 	max_bombs: i64
 }
 
-impl<'a> Fighter<'a> {
-    pub fn new(name: String, id: String, max_speed: f64, ship_id: &'a Movable, max_ceiling: f64, max_bombs: i64) -> Self {
+impl Fighter {
+    pub fn new(name: String, id: String, max_speed: f64, ship_id: Rc<Movable>, max_ceiling: f64, max_bombs: i64) -> Self {
         Fighter {
             name: name,
             id: id,
@@ -222,7 +223,7 @@ impl<'a> Fighter<'a> {
     }
 }
 
-impl<'a> Movable for Fighter<'a> {
+impl Movable for Fighter {
     fn get_is_deployed(&self) -> bool {
         return self.is_deployed;
     }
@@ -270,8 +271,8 @@ mod tests {
 
     #[test]
     fn test_fighter_new() {
-        let ship_id = Carrier::new(String::from("Gertrude"), String::from("P131"), 25.0, 15);
-        let a = Fighter::new(String::from("Brunhilde"), String::from("G264"), 500.0, &ship_id, 100000.0, 20);
+        let ship_id: Rc<dyn Movable> = Rc::new(Carrier::new(String::from("Gertrude"), String::from("P131"), 25.0, 15));
+        let a = Fighter::new(String::from("Brunhilde"), String::from("G264"), 500.0, ship_id, 100000.0, 20);
         a.print();
     }
 }
