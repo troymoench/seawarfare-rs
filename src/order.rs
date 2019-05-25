@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use std::cmp::Ordering;
 use crate::movable::*;
 
 // class Order {
@@ -30,8 +31,29 @@ pub trait Order {
     fn equals(&self, other: &Order) -> bool {
         return self.get_extime() == other.get_extime()
     }
-    fn lt(&self, other: &Order) -> bool {
-        return self.get_extime() < other.get_extime()
+
+    fn cmp(&self, other: &Order) -> Ordering {
+        return self.get_extime().partial_cmp(&other.get_extime()).unwrap();
+    }
+}
+
+impl PartialEq for Order {
+    fn eq(&self, other: &Order) -> bool {
+        return self.equals(other);
+    }
+}
+
+impl Eq for Order {}
+
+impl Ord for Order {
+    fn cmp(&self, other: &Order) -> Ordering {
+        return self.cmp(other);
+    }
+}
+
+impl PartialOrd for Order {
+    fn partial_cmp(&self, other: &Order) -> Option<Ordering> {
+        return Some(self.cmp(other));
     }
 }
 
