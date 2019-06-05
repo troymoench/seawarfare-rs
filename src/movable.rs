@@ -37,9 +37,9 @@ pub trait Movable {
     fn get_name(&self) -> String;
     fn get_location(&self) -> Location;
     fn get_history(&self) -> &HistoryList;
-    fn deploy(&self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool;
-    fn change(&self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool;
-    fn update_position(&self, t: chrono::NaiveDateTime);
+    fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool;
+    fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool;
+    fn update_position(&mut self, t: chrono::NaiveDateTime);
     fn print(&self) {
         println!("Name: {} ID: {}", self.get_name(), self.get_id());
     }
@@ -108,13 +108,20 @@ impl Movable for Cruiser {
     fn get_history(&self) -> &HistoryList {
         return &self.hl;
     }
-    fn deploy(&self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
+    fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
+        self.is_deployed = true;
+        self.was_deployed = true;
+        self.loc = Location::new(x, y, 0.0, t);
+        self.hl.push(self.loc);
+        self.heading = head;
+        self.speed = spd;
+        self.at = t;
+        return true;
+    }
+    fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
         return false;
     }
-    fn change(&self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
-        return false;
-    }
-    fn update_position(&self, t: chrono::NaiveDateTime) {
+    fn update_position(&mut self, t: chrono::NaiveDateTime) {
 
     }
 }
@@ -171,13 +178,20 @@ impl Movable for Carrier {
     fn get_history(&self) -> &HistoryList {
         return &self.hl;
     }
-    fn deploy(&self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
+    fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
+        self.is_deployed = true;
+        self.was_deployed = true;
+        self.loc = Location::new(x, y, 0.0, t);
+        self.hl.push(self.loc);
+        self.heading = head;
+        self.speed = spd;
+        self.at = t;
+        return true;
+    }
+    fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
         return false;
     }
-    fn change(&self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
-        return false;
-    }
-    fn update_position(&self, t: chrono::NaiveDateTime) {
+    fn update_position(&mut self, t: chrono::NaiveDateTime) {
 
     }
 }
@@ -221,6 +235,19 @@ impl Fighter {
             max_bombs: max_bombs
         }
     }
+
+    pub fn deploy(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
+        self.is_deployed = true;
+        self.was_deployed = true;
+        let ship_loc = self.ship_id.get_location();
+        self.loc = Location::new(ship_loc.x, ship_loc.y, alt, t);
+        self.hl.push(self.loc);
+        self.heading = head;
+        self.speed = spd;
+        self.altitude = alt;
+        self.at = t;
+        return true;
+    }
 }
 
 impl Movable for Fighter {
@@ -242,13 +269,13 @@ impl Movable for Fighter {
     fn get_history(&self) -> &HistoryList {
         return &self.hl;
     }
-    fn deploy(&self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
+    fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
         return false;
     }
-    fn change(&self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
+    fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
         return false;
     }
-    fn update_position(&self, t: chrono::NaiveDateTime) {
+    fn update_position(&mut self, t: chrono::NaiveDateTime) {
 
     }
 }
