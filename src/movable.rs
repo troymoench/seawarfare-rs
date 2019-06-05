@@ -112,7 +112,7 @@ impl Movable for Cruiser {
         self.is_deployed = true;
         self.was_deployed = true;
         self.loc = Location::new(x, y, 0.0, t);
-        self.hl.push(self.loc);
+        self.hl.push(self.loc.clone());
         self.heading = head;
         self.speed = spd;
         self.at = t;
@@ -182,7 +182,7 @@ impl Movable for Carrier {
         self.is_deployed = true;
         self.was_deployed = true;
         self.loc = Location::new(x, y, 0.0, t);
-        self.hl.push(self.loc);
+        self.hl.push(self.loc.clone());
         self.heading = head;
         self.speed = spd;
         self.at = t;
@@ -241,7 +241,7 @@ impl Fighter {
         self.was_deployed = true;
         let ship_loc = self.ship_id.get_location();
         self.loc = Location::new(ship_loc.x, ship_loc.y, alt, t);
-        self.hl.push(self.loc);
+        self.hl.push(self.loc.clone());
         self.heading = head;
         self.speed = spd;
         self.altitude = alt;
