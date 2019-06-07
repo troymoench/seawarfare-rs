@@ -24,7 +24,7 @@ use crate::movable::*;
 pub trait Order {
     fn get_id(&self) -> String;
     fn get_extime(&self) -> chrono::NaiveDateTime;
-    // fn execute(&self, Movable*, chrono::NaiveDateTime) -> bool;
+    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool;
     fn print(&self) {
         println!("ID: {}, extime: {}", self.get_id(), self.get_extime());
     }
@@ -89,7 +89,10 @@ impl Order for DeployShip {
         return self.extime.clone()
     }
 
-    // fn execute(&self, Movable*, chrono::NaiveDateTime) -> bool
+    // Execute the DeployShip order
+    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
+    //     return mov.deploy(self.start_x, self.start_y, self.heading, self.speed, t);
+    // }
 }
 
 #[derive(Debug)]
@@ -122,7 +125,10 @@ impl Order for DeployAircraft {
         return self.extime.clone()
     }
 
-    // fn execute(&self, Movable*, chrono::NaiveDateTime) -> bool
+    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
+    //     // return mov.deploy(self.heading, self.speed, self.altitude, t);
+    //     return false;
+    // }
 }
 
 #[derive(Debug)]
@@ -153,7 +159,9 @@ impl Order for ChangeShip {
         return self.extime.clone()
     }
 
-    // fn execute(&self, Movable*, chrono::NaiveDateTime) -> bool
+    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
+    //     return false;
+    // }
 }
 
 #[derive(Debug)]
@@ -186,7 +194,9 @@ impl Order for ChangeAircraft {
         return self.extime.clone()
     }
 
-    // fn execute(&self, Movable*, chrono::NaiveDateTime) -> bool
+    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
+    //     return false;
+    // }
 }
 
 // #[derive(Debug)]
@@ -215,7 +225,9 @@ impl Order for LandAircraft {
         return self.extime.clone()
     }
 
-    // fn execute(&self, Movable*, chrono::NaiveDateTime) -> bool
+    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
+    //     return false;
+    // }
 }
 
 

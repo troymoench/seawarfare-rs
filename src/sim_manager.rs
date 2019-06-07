@@ -75,6 +75,14 @@ impl SimManager {
 		println!("==========");
 	}
 
+	/// Print the history of each movable in the navy map
+	pub fn print_history(&self) {
+		for (_, val) in self.navy_map.iter() {
+			val.print();
+			val.print_hl();
+		}
+	}
+
 	/// Search for a movable in the navy map
 	fn find_movable(&self, id: String) -> &Rc<Movable> {
 		return self.navy_map.get(id.as_str()).unwrap();
@@ -250,4 +258,26 @@ impl SimManager {
 		// self.order_q.sort_by(|a, b| a.get_extime().partial_cmp(&b.get_extime()).unwrap());
 		return true;
 	}
+	// 
+	// /// Execute orders and update the navy map for a given time
+	// pub fn do_update(&mut self, now: chrono::NaiveDateTime) {
+	// 	// execute any orders that are scheduled to be executed
+	// 	while !self.order_q.is_empty() {
+	// 		let o = self.order_q.get_mut(0).unwrap();
+	// 		if o.get_extime() > now {break;}
+	// 		let o = self.order_q.first().unwrap();
+	// 		// TODO: add error handling
+	// 		// let mov = self.find_movable(o.get_id());
+	// 		let mov = self.navy_map.get(o.get_id().as_str()).unwrap();
+	// 		o.execute(mov.clone(), now);
+	// 	}
+	//
+	// 	// update the position of all deployed movables
+	// 	for (_, val) in self.navy_map.iter_mut() {
+	// 		if val.get_is_deployed() {
+	// 			val.update_position(now);
+	// 		}
+	// 	}
+	//
+	// }
 }
