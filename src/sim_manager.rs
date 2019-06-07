@@ -28,6 +28,38 @@ use crate::movable::*;
 type OrderQueue = Vec<Box<Order>>;
 type NavyMap = HashMap<String, Rc<Movable>>;
 
+pub enum Opcode {
+	StartSim,
+	StopSim,
+	EndSim,
+	CreateCruiser,
+	CreateAircraftCarrier,
+	CreateFighter,
+	DeployShip,
+	DeployAircraft,
+	ChangeShipOrders,
+	ChangeAircraftOrders,
+	LandAircraft
+}
+
+impl Opcode {
+	pub fn as_str(&self) -> &'static str {
+		match self {
+			Opcode::StartSim => "StartSim",
+			Opcode::StopSim => "StopSim",
+			Opcode::EndSim => "EndSim",
+			Opcode::CreateCruiser => "CreateCruiser",
+			Opcode::CreateAircraftCarrier => "CreateAircraftCarrier",
+			Opcode::CreateFighter => "CreateFighter",
+			Opcode::DeployShip => "DeployShip",
+			Opcode::DeployAircraft => "DeployAircraft",
+			Opcode::ChangeShipOrders => "ChangeShipOrders",
+			Opcode::ChangeAircraftOrders => "ChangeShipOrders",
+			Opcode::LandAircraft => "LandAircraft"
+		}
+	}
+}
+
 pub struct SimManager {
 	start: chrono::NaiveDateTime,
 	stop: chrono::NaiveDateTime,
