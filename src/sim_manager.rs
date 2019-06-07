@@ -182,8 +182,8 @@ impl SimManager {
 				let y = tokens[4].parse::<f64>().unwrap();
 				let head = tokens[5].parse::<f64>().unwrap();
 				let spd = tokens[6].parse::<f64>().unwrap();
-				let op = Box::new(DeployShip::new(atm, id, x, y, head, spd));
-				self.order_q.push(op);
+				let op = DeployShip::new(atm, id, x, y, head, spd);
+				self.order_q.push(Box::new(Order::DeployShipOrder(op)));
 			}
 			else if *opcode == "DeployAircraft" {
 				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
@@ -198,8 +198,9 @@ impl SimManager {
 				let head = tokens[3].parse::<f64>().unwrap();
 				let spd = tokens[4].parse::<f64>().unwrap();
 				let z = tokens[5].parse::<f64>().unwrap();
-				let op = Box::new(DeployAircraft::new(atm, id, head, spd, z));
-				self.order_q.push(op);
+				let op = DeployAircraft::new(atm, id, head, spd, z);
+				self.order_q.push(Box::new(Order::DeployAircraftOrder(op)));
+
 			}
 			else if *opcode == "ChangeShipOrders" {
 				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
@@ -213,8 +214,8 @@ impl SimManager {
 				let id = String::from(tokens[2]);
 				let head = tokens[3].parse::<f64>().unwrap();
 				let spd = tokens[4].parse::<f64>().unwrap();
-				let op = Box::new(ChangeShip::new(atm, id, head, spd));
-				self.order_q.push(op);
+				let op = ChangeShip::new(atm, id, head, spd);
+				self.order_q.push(Box::new(Order::ChangeShipOrder(op)));
 			}
 			else if *opcode == "ChangeAircraftOrders" {
 				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
@@ -229,8 +230,8 @@ impl SimManager {
 				let head = tokens[3].parse::<f64>().unwrap();
 				let spd = tokens[4].parse::<f64>().unwrap();
 				let z = tokens[5].parse::<f64>().unwrap();
-				let op = Box::new(ChangeAircraft::new(atm, id, head, spd, z));
-				self.order_q.push(op);
+				let op = ChangeAircraft::new(atm, id, head, spd, z);
+				self.order_q.push(Box::new(Order::ChangeAircraftOrder(op)));
 			}
 			else if *opcode == "LandAircraft" {
 				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
@@ -244,8 +245,8 @@ impl SimManager {
 				let ship_id = String::from(tokens[2]);
 				let id = String::from(tokens[3]);
 				let ship_ptr = self.find_movable(ship_id);
-				let op = Box::new(LandAircraft::new(atm, id, Rc::clone(ship_ptr)));
-				self.order_q.push(op);
+				let op = LandAircraft::new(atm, id, Rc::clone(ship_ptr));
+				self.order_q.push(Box::new(Order::LandAircraftOrder(op)));
 			}
 			else {
 				println!("Invalid opcode: {}", opcode);
@@ -258,7 +259,7 @@ impl SimManager {
 		// self.order_q.sort_by(|a, b| a.get_extime().partial_cmp(&b.get_extime()).unwrap());
 		return true;
 	}
-	// 
+	//
 	// /// Execute orders and update the navy map for a given time
 	// pub fn do_update(&mut self, now: chrono::NaiveDateTime) {
 	// 	// execute any orders that are scheduled to be executed

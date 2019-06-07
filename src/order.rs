@@ -20,16 +20,43 @@ use crate::movable::*;
 // 	ATime extime;
 // };
 
+pub enum Order {
+    DeployShipOrder(DeployShip),
+    DeployAircraftOrder(DeployAircraft),
+    ChangeShipOrder(ChangeShip),
+    ChangeAircraftOrder(ChangeAircraft),
+    LandAircraftOrder(LandAircraft),
+}
 
-pub trait Order {
-    fn get_id(&self) -> String;
-    fn get_extime(&self) -> chrono::NaiveDateTime;
-    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool;
-    fn print(&self) {
-        println!("ID: {}, extime: {}", self.get_id(), self.get_extime());
+impl Order {
+    pub fn get_id(&self) -> String {
+        match self {
+            Order::DeployShipOrder(o) => o.get_id(),
+            Order::DeployAircraftOrder(o) => o.get_id(),
+            Order::ChangeShipOrder(o) => o.get_id(),
+            Order::ChangeAircraftOrder(o) => o.get_id(),
+            Order::LandAircraftOrder(o) => o.get_id(),
+        }
     }
-    fn equals(&self, other: &Order) -> bool {
-        return self.get_extime() == other.get_extime()
+
+    pub fn get_extime(&self) -> chrono::NaiveDateTime{
+        match self {
+            Order::DeployShipOrder(o) => o.get_extime(),
+            Order::DeployAircraftOrder(o) => o.get_extime(),
+            Order::ChangeShipOrder(o) => o.get_extime(),
+            Order::ChangeAircraftOrder(o) => o.get_extime(),
+            Order::LandAircraftOrder(o) => o.get_extime(),
+        }
+    }
+
+    pub fn print(&self) {
+        match self {
+            Order::DeployShipOrder(o) => o.print(),
+            Order::DeployAircraftOrder(o) => o.print(),
+            Order::ChangeShipOrder(o) => o.print(),
+            Order::ChangeAircraftOrder(o) => o.print(),
+            Order::LandAircraftOrder(o) => o.print(),
+        }
     }
 
     fn cmp(&self, other: &Order) -> Ordering {
@@ -39,7 +66,7 @@ pub trait Order {
 
 impl PartialEq for Order {
     fn eq(&self, other: &Order) -> bool {
-        return self.equals(other);
+        return self.cmp(other) == Ordering::Equal;
     }
 }
 
@@ -78,21 +105,18 @@ impl DeployShip {
             speed: spd
         }
     }
-}
 
-impl Order for DeployShip {
-    fn get_id(&self) -> String {
+    pub fn get_id(&self) -> String {
         return self.id.clone()
     }
 
-    fn get_extime(&self) -> chrono::NaiveDateTime {
+    pub fn get_extime(&self) -> chrono::NaiveDateTime {
         return self.extime.clone()
     }
 
-    // Execute the DeployShip order
-    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
-    //     return mov.deploy(self.start_x, self.start_y, self.heading, self.speed, t);
-    // }
+    pub fn print(&self) {
+        println!("id: {} extime: {}", self.id, self.extime)
+    }
 }
 
 #[derive(Debug)]
@@ -114,21 +138,18 @@ impl DeployAircraft {
             altitude: alt
         }
     }
-}
 
-impl Order for DeployAircraft {
-    fn get_id(&self) -> String {
+    pub fn get_id(&self) -> String {
         return self.id.clone()
     }
 
-    fn get_extime(&self) -> chrono::NaiveDateTime {
+    pub fn get_extime(&self) -> chrono::NaiveDateTime {
         return self.extime.clone()
     }
 
-    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
-    //     // return mov.deploy(self.heading, self.speed, self.altitude, t);
-    //     return false;
-    // }
+    pub fn print(&self) {
+        println!("id: {} extime: {}", self.id, self.extime)
+    }
 }
 
 #[derive(Debug)]
@@ -148,20 +169,18 @@ impl ChangeShip {
             speed: spd,
         }
     }
-}
 
-impl Order for ChangeShip {
-    fn get_id(&self) -> String {
+    pub fn get_id(&self) -> String {
         return self.id.clone()
     }
 
-    fn get_extime(&self) -> chrono::NaiveDateTime {
+    pub fn get_extime(&self) -> chrono::NaiveDateTime {
         return self.extime.clone()
     }
 
-    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
-    //     return false;
-    // }
+    pub fn print(&self) {
+        println!("id: {} extime: {}", self.id, self.extime)
+    }
 }
 
 #[derive(Debug)]
@@ -183,20 +202,18 @@ impl ChangeAircraft {
             altitude: alt
         }
     }
-}
 
-impl Order for ChangeAircraft {
-    fn get_id(&self) -> String {
+    pub fn get_id(&self) -> String {
         return self.id.clone()
     }
 
-    fn get_extime(&self) -> chrono::NaiveDateTime {
+    pub fn get_extime(&self) -> chrono::NaiveDateTime {
         return self.extime.clone()
     }
 
-    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
-    //     return false;
-    // }
+    pub fn print(&self) {
+        println!("id: {} extime: {}", self.id, self.extime)
+    }
 }
 
 // #[derive(Debug)]
@@ -214,20 +231,18 @@ impl LandAircraft {
             ship_id: ship_id
         }
     }
-}
 
-impl Order for LandAircraft {
-    fn get_id(&self) -> String {
+    pub fn get_id(&self) -> String {
         return self.id.clone()
     }
 
-    fn get_extime(&self) -> chrono::NaiveDateTime {
+    pub fn get_extime(&self) -> chrono::NaiveDateTime {
         return self.extime.clone()
     }
 
-    // fn execute(&self, mov: Rc<Movable>, t: chrono::NaiveDateTime) -> bool {
-    //     return false;
-    // }
+    pub fn print(&self) {
+        println!("id: {} extime: {}", self.id, self.extime)
+    }
 }
 
 
@@ -276,7 +291,7 @@ mod tests {
         let atime = chrono::NaiveDate::from_ymd(2015, 10, 21).and_hms(17, 2, 0);
         let a = DeployShip::new(atime, String::from("CGN-39"), 0.0, 0.0, 0.0, 0.0);
         let b = DeployShip::new(atime, String::from("CVN-68"), 1.0, 1.0, 0.0, 0.0);
-        assert!(a.equals(&b));
+        assert!(Order::DeployShipOrder(a) == Order::DeployShipOrder(b));
     }
 
     #[test]
@@ -285,6 +300,6 @@ mod tests {
         let a = DeployShip::new(atime, String::from("CGN-39"), 0.0, 0.0, 0.0, 0.0);
         let btime = atime - chrono::Duration::seconds(1);
         let b = DeployShip::new(btime, String::from("CVN-68"), 1.0, 1.0, 0.0, 0.0);
-        assert!(!a.equals(&b));
+        assert!(Order::DeployShipOrder(a) != Order::DeployShipOrder(b));
     }
 }
