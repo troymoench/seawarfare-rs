@@ -28,6 +28,7 @@ use crate::movable::*;
 type OrderQueue = Vec<Box<Order>>;
 type NavyMap = HashMap<String, Rc<Movable>>;
 
+#[derive(Debug)]
 pub enum Opcode {
 	StartSim,
 	StopSim,
@@ -39,23 +40,25 @@ pub enum Opcode {
 	DeployAircraft,
 	ChangeShipOrders,
 	ChangeAircraftOrders,
-	LandAircraft
+	LandAircraft,
+	Invalid,
 }
 
 impl Opcode {
-	pub fn as_str(&self) -> &'static str {
-		match self {
-			Opcode::StartSim => "StartSim",
-			Opcode::StopSim => "StopSim",
-			Opcode::EndSim => "EndSim",
-			Opcode::CreateCruiser => "CreateCruiser",
-			Opcode::CreateAircraftCarrier => "CreateAircraftCarrier",
-			Opcode::CreateFighter => "CreateFighter",
-			Opcode::DeployShip => "DeployShip",
-			Opcode::DeployAircraft => "DeployAircraft",
-			Opcode::ChangeShipOrders => "ChangeShipOrders",
-			Opcode::ChangeAircraftOrders => "ChangeShipOrders",
-			Opcode::LandAircraft => "LandAircraft"
+	pub fn new(op: &str) -> Self {
+		match op {
+			 "StartSim" => Opcode::StartSim,
+			 "StopSim" => Opcode::StopSim,
+			 "EndSim" => Opcode::EndSim,
+			 "CreateCruiser" => Opcode::CreateCruiser,
+			 "CreateAircraftCarrier" => Opcode::CreateAircraftCarrier,
+			 "CreateFighter" => Opcode::CreateFighter,
+			 "DeployShip" => Opcode::DeployShip,
+			 "DeployAircraft" => Opcode::DeployAircraft,
+			 "ChangeShipOrders" => Opcode::ChangeShipOrders,
+			 "ChangeAircraftOrders" => Opcode::ChangeAircraftOrders,
+			 "LandAircraft" => Opcode::LandAircraft,
+			 _ => Opcode::Invalid
 		}
 	}
 }
@@ -146,143 +149,144 @@ impl SimManager {
 
 			// split line on whitespace
 			let mut tokens: Vec<&str> = line.split_whitespace().collect();
-			let opcode = &tokens.remove(0);
+			let opcode = Opcode::new(&tokens.remove(0));
 			// for s in &tokens {
 			// 	println!("s: {}", s);
 			// }
-			println!("opcode: {}", &opcode);
+			println!("opcode: {:?}", &opcode);
 
-			if *opcode == "StartSim" {
-				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
-				let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																   "%m/%d/%Y %H:%M:%S");
-				match parsed {
-					Ok(dt) => self.start = dt,
-					Err(_error) => return false
-				};
-			}
-			else if *opcode == "StopSim" || *opcode == "EndSim" {
-				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
-				let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																   "%m/%d/%Y %H:%M:%S");
-				match parsed {
-					Ok(dt) => self.stop = dt,
-					Err(_error) => return false
-				};
-			}
-			else if *opcode == "CreateCruiser" {
-				let name = String::from(tokens[0]);
-				let id = String::from(tokens[1]);
-				let max_speed = tokens[2].parse::<f64>().unwrap();
-				let missiles = tokens[3].parse::<i64>().unwrap();
+			match opcode {
+				Opcode::StartSim => {
+					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
+					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
+																	   "%m/%d/%Y %H:%M:%S");
+					match parsed {
+						Ok(dt) => self.start = dt,
+						Err(_error) => return false
+					};
+				},
+				Opcode::StopSim | Opcode::EndSim => {
+					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
+					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
+																	   "%m/%d/%Y %H:%M:%S");
+					match parsed {
+						Ok(dt) => self.stop = dt,
+						Err(_error) => return false
+					};
+				},
+				Opcode::CreateCruiser => {
+					let name = String::from(tokens[0]);
+					let id = String::from(tokens[1]);
+					let max_speed = tokens[2].parse::<f64>().unwrap();
+					let missiles = tokens[3].parse::<i64>().unwrap();
 
-				let mp = Rc::new(Cruiser::new(name, id.clone(), max_speed, missiles));
-				self.navy_map.insert(id, mp);
-			}
-			else if *opcode == "CreateAircraftCarrier" {
-				let name = String::from(tokens[0]);
-				let id = String::from(tokens[1]);
-				let max_speed = tokens[2].parse::<f64>().unwrap();
-				let max_aircraft = tokens[3].parse::<i64>().unwrap();
+					let mp = Rc::new(Cruiser::new(name, id.clone(), max_speed, missiles));
+					self.navy_map.insert(id, mp);
+				},
+				Opcode::CreateAircraftCarrier => {
+					let name = String::from(tokens[0]);
+					let id = String::from(tokens[1]);
+					let max_speed = tokens[2].parse::<f64>().unwrap();
+					let max_aircraft = tokens[3].parse::<i64>().unwrap();
 
-				let mp = Rc::new(Carrier::new(name, id.clone(), max_speed, max_aircraft));
-				self.navy_map.insert(id, mp);
-			}
-			else if *opcode == "CreateFighter" {
-				let name = String::from(tokens[0]);
-				let id = String::from(tokens[1]);
-				let ship_id = String::from(tokens[2]);
-				let max_speed = tokens[3].parse::<f64>().unwrap();
-				let max_ceiling = tokens[4].parse::<f64>().unwrap();
-				let max_bombs = tokens[5].parse::<i64>().unwrap();
+					let mp = Rc::new(Carrier::new(name, id.clone(), max_speed, max_aircraft));
+					self.navy_map.insert(id, mp);
+				},
+				Opcode::CreateFighter => {
+					let name = String::from(tokens[0]);
+					let id = String::from(tokens[1]);
+					let ship_id = String::from(tokens[2]);
+					let max_speed = tokens[3].parse::<f64>().unwrap();
+					let max_ceiling = tokens[4].parse::<f64>().unwrap();
+					let max_bombs = tokens[5].parse::<i64>().unwrap();
 
-				let ship_ptr = self.find_movable(ship_id);
-				let mp = Rc::new(Fighter::new(name, id.clone(), max_speed, Rc::clone(ship_ptr), max_ceiling, max_bombs));
-				self.navy_map.insert(id, mp);
-			}
-			else if *opcode == "DeployShip" {
-				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
-				let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																   "%m/%d/%Y %H:%M:%S");
-				let atm = match parsed {
-					Ok(dt) => dt,
-					Err(_error) => return false
-				};
+					let ship_ptr = self.find_movable(ship_id);
+					let mp = Rc::new(Fighter::new(name, id.clone(), max_speed, Rc::clone(ship_ptr), max_ceiling, max_bombs));
+					self.navy_map.insert(id, mp);
+				},
+				Opcode::DeployShip => {
+					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
+					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
+																	   "%m/%d/%Y %H:%M:%S");
+					let atm = match parsed {
+						Ok(dt) => dt,
+						Err(_error) => return false
+					};
 
-				let id = String::from(tokens[2]);
-				let x = tokens[3].parse::<f64>().unwrap();
-				let y = tokens[4].parse::<f64>().unwrap();
-				let head = tokens[5].parse::<f64>().unwrap();
-				let spd = tokens[6].parse::<f64>().unwrap();
-				let op = DeployShip::new(atm, id, x, y, head, spd);
-				self.order_q.push(Box::new(Order::DeployShipOrder(op)));
-			}
-			else if *opcode == "DeployAircraft" {
-				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
-				let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																   "%m/%d/%Y %H:%M:%S");
-				let atm = match parsed {
-					Ok(dt) => dt,
-					Err(_error) => return false
-				};
+					let id = String::from(tokens[2]);
+					let x = tokens[3].parse::<f64>().unwrap();
+					let y = tokens[4].parse::<f64>().unwrap();
+					let head = tokens[5].parse::<f64>().unwrap();
+					let spd = tokens[6].parse::<f64>().unwrap();
+					let op = DeployShip::new(atm, id, x, y, head, spd);
+					self.order_q.push(Box::new(Order::DeployShipOrder(op)));
+				},
+				Opcode::DeployAircraft => {
+					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
+					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
+																	   "%m/%d/%Y %H:%M:%S");
+					let atm = match parsed {
+						Ok(dt) => dt,
+						Err(_error) => return false
+					};
 
-				let id = String::from(tokens[2]);
-				let head = tokens[3].parse::<f64>().unwrap();
-				let spd = tokens[4].parse::<f64>().unwrap();
-				let z = tokens[5].parse::<f64>().unwrap();
-				let op = DeployAircraft::new(atm, id, head, spd, z);
-				self.order_q.push(Box::new(Order::DeployAircraftOrder(op)));
+					let id = String::from(tokens[2]);
+					let head = tokens[3].parse::<f64>().unwrap();
+					let spd = tokens[4].parse::<f64>().unwrap();
+					let z = tokens[5].parse::<f64>().unwrap();
+					let op = DeployAircraft::new(atm, id, head, spd, z);
+					self.order_q.push(Box::new(Order::DeployAircraftOrder(op)));
+				},
+				Opcode::ChangeShipOrders => {
+					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
+					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
+																	   "%m/%d/%Y %H:%M:%S");
+					let atm = match parsed {
+						Ok(dt) => dt,
+						Err(_error) => return false
+					};
 
-			}
-			else if *opcode == "ChangeShipOrders" {
-				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
-				let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																   "%m/%d/%Y %H:%M:%S");
-				let atm = match parsed {
-					Ok(dt) => dt,
-					Err(_error) => return false
-				};
+					let id = String::from(tokens[2]);
+					let head = tokens[3].parse::<f64>().unwrap();
+					let spd = tokens[4].parse::<f64>().unwrap();
+					let op = ChangeShip::new(atm, id, head, spd);
+					self.order_q.push(Box::new(Order::ChangeShipOrder(op)));
+				},
+				Opcode::ChangeAircraftOrders => {
+					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
+					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
+																	   "%m/%d/%Y %H:%M:%S");
+					let atm = match parsed {
+						Ok(dt) => dt,
+						Err(_error) => return false
+					};
 
-				let id = String::from(tokens[2]);
-				let head = tokens[3].parse::<f64>().unwrap();
-				let spd = tokens[4].parse::<f64>().unwrap();
-				let op = ChangeShip::new(atm, id, head, spd);
-				self.order_q.push(Box::new(Order::ChangeShipOrder(op)));
-			}
-			else if *opcode == "ChangeAircraftOrders" {
-				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
-				let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																   "%m/%d/%Y %H:%M:%S");
-				let atm = match parsed {
-					Ok(dt) => dt,
-					Err(_error) => return false
-				};
+					let id = String::from(tokens[2]);
+					let head = tokens[3].parse::<f64>().unwrap();
+					let spd = tokens[4].parse::<f64>().unwrap();
+					let z = tokens[5].parse::<f64>().unwrap();
+					let op = ChangeAircraft::new(atm, id, head, spd, z);
+					self.order_q.push(Box::new(Order::ChangeAircraftOrder(op)));
+				},
+				Opcode::LandAircraft => {
+					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
+					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
+																	   "%m/%d/%Y %H:%M:%S");
+					let atm = match parsed {
+						Ok(dt) => dt,
+						Err(_error) => return false
+					};
 
-				let id = String::from(tokens[2]);
-				let head = tokens[3].parse::<f64>().unwrap();
-				let spd = tokens[4].parse::<f64>().unwrap();
-				let z = tokens[5].parse::<f64>().unwrap();
-				let op = ChangeAircraft::new(atm, id, head, spd, z);
-				self.order_q.push(Box::new(Order::ChangeAircraftOrder(op)));
-			}
-			else if *opcode == "LandAircraft" {
-				let date_time_str = format!("{} {}", tokens[0], tokens[1]);
-				let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																   "%m/%d/%Y %H:%M:%S");
-				let atm = match parsed {
-					Ok(dt) => dt,
-					Err(_error) => return false
-				};
-
-				let ship_id = String::from(tokens[2]);
-				let id = String::from(tokens[3]);
-				let ship_ptr = self.find_movable(ship_id);
-				let op = LandAircraft::new(atm, id, Rc::clone(ship_ptr));
-				self.order_q.push(Box::new(Order::LandAircraftOrder(op)));
-			}
-			else {
-				println!("Invalid opcode: {}", opcode);
-				return false;
+					let ship_id = String::from(tokens[2]);
+					let id = String::from(tokens[3]);
+					let ship_ptr = self.find_movable(ship_id);
+					let op = LandAircraft::new(atm, id, Rc::clone(ship_ptr));
+					self.order_q.push(Box::new(Order::LandAircraftOrder(op)));
+				},
+				Opcode::Invalid => {
+					println!("Invalid opcode: {:?}", opcode);
+					return false;
+				},
 			}
 
 	    }
