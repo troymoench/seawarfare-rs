@@ -86,12 +86,12 @@ impl PartialOrd for Order {
 
 #[derive(Debug)]
 pub struct DeployShip {
-    id: String,
-    extime: chrono::NaiveDateTime,
-    start_x: f64,
-    start_y: f64,
-    heading: f64,
-    speed: f64
+    pub id: String,
+    pub extime: chrono::NaiveDateTime,
+    pub start_x: f64,
+    pub start_y: f64,
+    pub heading: f64,
+    pub speed: f64
 }
 
 impl DeployShip {
@@ -121,11 +121,11 @@ impl DeployShip {
 
 #[derive(Debug)]
 pub struct DeployAircraft {
-    id: String,
-    extime: chrono::NaiveDateTime,
-    heading: f64,
-    speed: f64,
-    altitude: f64
+    pub id: String,
+    pub extime: chrono::NaiveDateTime,
+    pub heading: f64,
+    pub speed: f64,
+    pub altitude: f64
 }
 
 impl DeployAircraft {
@@ -154,10 +154,10 @@ impl DeployAircraft {
 
 #[derive(Debug)]
 pub struct ChangeShip {
-    id: String,
-    extime: chrono::NaiveDateTime,
-    heading: f64,
-    speed: f64,
+    pub id: String,
+    pub extime: chrono::NaiveDateTime,
+    pub heading: f64,
+    pub speed: f64,
 }
 
 impl ChangeShip {
@@ -185,11 +185,11 @@ impl ChangeShip {
 
 #[derive(Debug)]
 pub struct ChangeAircraft {
-    id: String,
-    extime: chrono::NaiveDateTime,
-    heading: f64,
-    speed: f64,
-    altitude: f64
+    pub id: String,
+    pub extime: chrono::NaiveDateTime,
+    pub heading: f64,
+    pub speed: f64,
+    pub altitude: f64
 }
 
 impl ChangeAircraft {
@@ -218,9 +218,9 @@ impl ChangeAircraft {
 
 // #[derive(Debug)]
 pub struct LandAircraft {
-    id: String,
-    extime: chrono::NaiveDateTime,
-    ship_id: Rc<Movable>
+    pub id: String,
+    pub extime: chrono::NaiveDateTime,
+    pub ship_id: Rc<Movable>
 }
 
 impl LandAircraft {
