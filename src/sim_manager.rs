@@ -305,8 +305,8 @@ impl SimManager {
 	// 		let o = self.order_q.first().unwrap();
 	// 		// TODO: add error handling
 	// 		// let mov = self.find_movable(o.get_id());
-	// 		let mov = self.navy_map.get(o.get_id().as_str()).unwrap();
-	// 		o.execute(mov.clone(), now);
+	// 		let mov = self.navy_map.get_mut(o.get_id().as_str()).unwrap();
+	// 		mov.execute(o);
 	// 	}
 	//
 	// 	// update the position of all deployed movables

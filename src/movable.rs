@@ -1,5 +1,6 @@
 use std::rc::Rc;
 use crate::location::Location;
+use crate::order::*;
 
 // class Movable {
 // public:
@@ -40,6 +41,7 @@ pub trait Movable {
     fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool;
     fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool;
     fn update_position(&mut self, t: chrono::NaiveDateTime);
+    fn execute(&mut self, order: &Order);
     fn print(&self) {
         println!("Name: {} ID: {}", self.get_name(), self.get_id());
     }
@@ -108,6 +110,15 @@ impl Movable for Cruiser {
     fn get_history(&self) -> &HistoryList {
         return &self.hl;
     }
+    /// determine which order we have received
+    /// and call the function associated with it
+    fn execute(&mut self, order: &Order) {
+        let result = match order {
+            Order::DeployShipOrder(o) => self.deploy(o.start_x, o.start_y, o.heading, o.speed, o.extime),
+            Order::ChangeShipOrder(o) => self.change(o.heading, o.speed, 0.0, o.extime),
+            _ => false
+        };
+    }
     fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
         self.is_deployed = true;
         self.was_deployed = true;
@@ -119,7 +130,14 @@ impl Movable for Cruiser {
         return true;
     }
     fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
-        return false;
+        self.update_position(t);
+        if head != -1.0 {
+            self.heading = head;
+        }
+        if spd != -1.0 {
+            self.speed = spd;
+        }
+        return true;
     }
     fn update_position(&mut self, t: chrono::NaiveDateTime) {
 
@@ -178,6 +196,15 @@ impl Movable for Carrier {
     fn get_history(&self) -> &HistoryList {
         return &self.hl;
     }
+    /// determine which order we have received
+    /// and call the function associated with it
+    fn execute(&mut self, order: &Order) {
+        let result = match order {
+            Order::DeployShipOrder(o) => self.deploy(o.start_x, o.start_y, o.heading, o.speed, o.extime),
+            Order::ChangeShipOrder(o) => self.change(o.heading, o.speed, 0.0, o.extime),
+            _ => false
+        };
+    }
     fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
         self.is_deployed = true;
         self.was_deployed = true;
@@ -189,7 +216,14 @@ impl Movable for Carrier {
         return true;
     }
     fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
-        return false;
+        self.update_position(t);
+        if head != -1.0 {
+            self.heading = head;
+        }
+        if spd != -1.0 {
+            self.speed = spd;
+        }
+        return true;
     }
     fn update_position(&mut self, t: chrono::NaiveDateTime) {
 
@@ -248,6 +282,13 @@ impl Fighter {
         self.at = t;
         return true;
     }
+
+    pub fn land(&mut self, ship_id: Rc<Movable>, t:chrono::NaiveDateTime) -> bool {
+        self.ship_id = ship_id;
+        self.update_position(t);
+        self.is_landing = true;
+        return true;
+    }
 }
 
 impl Movable for Fighter {
@@ -269,11 +310,32 @@ impl Movable for Fighter {
     fn get_history(&self) -> &HistoryList {
         return &self.hl;
     }
+    /// determine which order we have received
+    /// and call the function associated with it
+    fn execute(&mut self, order: &Order) {
+        let result = match order {
+            Order::DeployAircraftOrder(o) => self.deploy(o.heading, o.speed, o.altitude, o.extime),
+            Order::ChangeAircraftOrder(o) => self.change(o.heading, o.speed, o.altitude, o.extime),
+            // Order::LandAircraftOrder(o) => self.land(o.ship_id, o.extime),
+            _ => false
+        };
+    }
     fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
         return false;
     }
     fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
-        return false;
+        self.update_position(t);
+        if spd != -1.0 {
+            self.speed = spd;
+        }
+        if alt != -1.0 {
+            // loc.setZ(alt);
+            self.altitude = alt;
+        }
+        if !self.is_landing && head != -1.0 {
+            self.heading = head;
+        }
+        return true;
     }
     fn update_position(&mut self, t: chrono::NaiveDateTime) {
 
@@ -301,5 +363,15 @@ mod tests {
         let ship_id: Rc<dyn Movable> = Rc::new(Carrier::new(String::from("Gertrude"), String::from("P131"), 25.0, 15));
         let a = Fighter::new(String::from("Brunhilde"), String::from("G264"), 500.0, ship_id, 100000.0, 20);
         a.print();
+    }
+
+    #[test]
+    fn test_execute_order() {
+        let mut a = Box::new(Cruiser::new(String::from("Chelsey"), String::from("I264"), 12.0, 30));
+        a.print();
+        let atime = chrono::NaiveDate::from_ymd(2015, 10, 21).and_hms(17, 2, 0);
+        let op = DeployShip::new(atime, String::from("CGN-39"), 0.0, 0.0, 0.0, 0.0);
+        let order = Order::DeployShipOrder(op);
+        a.execute(&order);
     }
 }
