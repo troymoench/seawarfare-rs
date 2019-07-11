@@ -1,4 +1,3 @@
-use std::rc::Rc;
 use crate::location::Location;
 use crate::order::*;
 
@@ -243,14 +242,15 @@ pub struct Fighter {
     max_speed: f64,
     hl: HistoryList,
     is_landing: bool,
-	ship_id: Rc<Movable>,
+	ship_id: String,
+    ship_loc: Location,
 	max_ceiling: f64,
 	altitude: f64,
 	max_bombs: i64
 }
 
 impl Fighter {
-    pub fn new(name: String, id: String, max_speed: f64, ship_id: Rc<Movable>, max_ceiling: f64, max_bombs: i64) -> Self {
+    pub fn new(name: String, id: String, max_speed: f64, ship_id: String, max_ceiling: f64, max_bombs: i64) -> Self {
         Fighter {
             name: name,
             id: id,
@@ -264,6 +264,7 @@ impl Fighter {
             hl: HistoryList::new(),
             is_landing: false,
             ship_id: ship_id,
+            ship_loc: Location::default(),
             max_ceiling: max_ceiling,
             altitude: 0.0,
             max_bombs: max_bombs
@@ -273,8 +274,7 @@ impl Fighter {
     pub fn deploy(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
         self.is_deployed = true;
         self.was_deployed = true;
-        let ship_loc = self.ship_id.get_location();
-        self.loc = Location::new(ship_loc.x, ship_loc.y, alt, t);
+        self.loc = Location::new(self.ship_loc.x, self.ship_loc.y, alt, t);
         self.hl.push(self.loc.clone());
         self.heading = head;
         self.speed = spd;
@@ -283,7 +283,7 @@ impl Fighter {
         return true;
     }
 
-    pub fn land(&mut self, ship_id: Rc<Movable>, t:chrono::NaiveDateTime) -> bool {
+    pub fn land(&mut self, ship_id: String, t:chrono::NaiveDateTime) -> bool {
         self.ship_id = ship_id;
         self.update_position(t);
         self.is_landing = true;
@@ -360,8 +360,7 @@ mod tests {
 
     #[test]
     fn test_fighter_new() {
-        let ship_id: Rc<dyn Movable> = Rc::new(Carrier::new(String::from("Gertrude"), String::from("P131"), 25.0, 15));
-        let a = Fighter::new(String::from("Brunhilde"), String::from("G264"), 500.0, ship_id, 100000.0, 20);
+        let a = Fighter::new(String::from("Brunhilde"), String::from("G264"), 500.0, String::from("P131"), 100000.0, 20);
         a.print();
     }
 

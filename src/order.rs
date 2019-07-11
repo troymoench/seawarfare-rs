@@ -1,6 +1,4 @@
-use std::rc::Rc;
 use std::cmp::Ordering;
-use crate::movable::*;
 
 // class Order {
 // public:
@@ -220,11 +218,11 @@ impl ChangeAircraft {
 pub struct LandAircraft {
     pub id: String,
     pub extime: chrono::NaiveDateTime,
-    pub ship_id: Rc<Movable>
+    pub ship_id: String
 }
 
 impl LandAircraft {
-    pub fn new(a: chrono::NaiveDateTime, id: String, ship_id: Rc<Movable>) -> Self {
+    pub fn new(a: chrono::NaiveDateTime, id: String, ship_id: String) -> Self {
         LandAircraft {
             extime: a,
             id: id,
@@ -281,8 +279,7 @@ mod tests {
     #[test]
     fn test_land_aircraft_new() {
         let atime = chrono::NaiveDate::from_ymd(2015, 11, 21).and_hms(17, 13, 0);
-        let ship: Rc<dyn Movable> = Rc::new(Carrier::new(String::from("USS_Nimitz"), String::from("CVN-68"), 85.0, 50));
-        let a = LandAircraft::new(atime, String::from("FA18C_1"), ship);
+        let a = LandAircraft::new(atime, String::from("FA18C_1"), String::from("CVN-68"));
         a.print();
     }
 

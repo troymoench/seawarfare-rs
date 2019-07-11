@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufReader, BufRead};
-use std::rc::Rc;
+use chrono::Duration;
 use crate::order::*;
 use crate::movable::*;
 
@@ -26,7 +26,7 @@ use crate::movable::*;
 // };
 
 type OrderQueue = Vec<Box<Order>>;
-type NavyMap = HashMap<String, Rc<Movable>>;
+type NavyMap = HashMap<String, Box<Movable>>;
 
 #[derive(Debug)]
 pub enum Opcode {
@@ -119,7 +119,7 @@ impl SimManager {
 	}
 
 	/// Search for a movable in the navy map
-	fn find_movable(&self, id: String) -> &Rc<Movable> {
+	fn find_movable(&self, id: String) -> &Box<Movable> {
 		return self.navy_map.get(id.as_str()).unwrap();
 	}
 
@@ -180,7 +180,7 @@ impl SimManager {
 					let max_speed = tokens[2].parse::<f64>().unwrap();
 					let missiles = tokens[3].parse::<i64>().unwrap();
 
-					let mp = Rc::new(Cruiser::new(name, id.clone(), max_speed, missiles));
+					let mp = Box::new(Cruiser::new(name, id.clone(), max_speed, missiles));
 					self.navy_map.insert(id, mp);
 				},
 				Opcode::CreateAircraftCarrier => {
@@ -189,7 +189,7 @@ impl SimManager {
 					let max_speed = tokens[2].parse::<f64>().unwrap();
 					let max_aircraft = tokens[3].parse::<i64>().unwrap();
 
-					let mp = Rc::new(Carrier::new(name, id.clone(), max_speed, max_aircraft));
+					let mp = Box::new(Carrier::new(name, id.clone(), max_speed, max_aircraft));
 					self.navy_map.insert(id, mp);
 				},
 				Opcode::CreateFighter => {
@@ -200,8 +200,7 @@ impl SimManager {
 					let max_ceiling = tokens[4].parse::<f64>().unwrap();
 					let max_bombs = tokens[5].parse::<i64>().unwrap();
 
-					let ship_ptr = self.find_movable(ship_id);
-					let mp = Rc::new(Fighter::new(name, id.clone(), max_speed, Rc::clone(ship_ptr), max_ceiling, max_bombs));
+					let mp = Box::new(Fighter::new(name, id.clone(), max_speed, ship_id.clone(), max_ceiling, max_bombs));
 					self.navy_map.insert(id, mp);
 				},
 				Opcode::DeployShip => {
@@ -279,8 +278,7 @@ impl SimManager {
 
 					let ship_id = String::from(tokens[2]);
 					let id = String::from(tokens[3]);
-					let ship_ptr = self.find_movable(ship_id);
-					let op = LandAircraft::new(atm, id, Rc::clone(ship_ptr));
+					let op = LandAircraft::new(atm, id, ship_id.clone());
 					self.order_q.push(Box::new(Order::LandAircraftOrder(op)));
 				},
 				Opcode::Invalid => {
@@ -295,26 +293,36 @@ impl SimManager {
 		// self.order_q.sort_by(|a, b| a.get_extime().partial_cmp(&b.get_extime()).unwrap());
 		return true;
 	}
-	//
-	// /// Execute orders and update the navy map for a given time
-	// pub fn do_update(&mut self, now: chrono::NaiveDateTime) {
-	// 	// execute any orders that are scheduled to be executed
-	// 	while !self.order_q.is_empty() {
-	// 		let o = self.order_q.get_mut(0).unwrap();
-	// 		if o.get_extime() > now {break;}
-	// 		let o = self.order_q.first().unwrap();
-	// 		// TODO: add error handling
-	// 		// let mov = self.find_movable(o.get_id());
-	// 		let mov = self.navy_map.get_mut(o.get_id().as_str()).unwrap();
-	// 		mov.execute(o);
-	// 	}
-	//
-	// 	// update the position of all deployed movables
-	// 	for (_, val) in self.navy_map.iter_mut() {
-	// 		if val.get_is_deployed() {
-	// 			val.update_position(now);
-	// 		}
-	// 	}
-	//
-	// }
+
+	/// Execute orders and update the navy map for a given time
+	pub fn do_update(&mut self, now: chrono::NaiveDateTime) {
+		// execute any orders that are scheduled to be executed
+		while !self.order_q.is_empty() {
+			let o = self.order_q.first().unwrap();
+			if o.get_extime() > now {break;}
+			let o = &self.order_q.remove(0);
+			let mov = match self.navy_map.get_mut(o.get_id().as_str()) {
+				Some(id) => id,
+				None => {println!("Unable to find id: {}, skipping order", o.get_id().as_str()); continue;}
+			};
+			mov.execute(o);
+		}
+		// update the position of all deployed movables
+		for (_, val) in self.navy_map.iter_mut() {
+			if val.get_is_deployed() {
+				val.update_position(now);
+			}
+		}
+	}
+
+	/// Execute the simulation
+	pub fn execute(&mut self) {
+		println!("starting sim");
+		let mut t = self.start;
+		while t < self.stop {
+			self.do_update(t);
+			t += Duration::seconds(60);
+		}
+		println!("sim completed");
+	}
 }
