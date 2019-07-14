@@ -139,7 +139,16 @@ impl Movable for Cruiser {
         return true;
     }
     fn update_position(&mut self, t: chrono::NaiveDateTime) {
-
+        if self.at == t {
+            return;
+        }
+        let time: f64 = ((t - self.at).num_seconds() as f64) / (60.0 * 60.0);
+        let distance = self.speed * time;
+        let dx = distance * self.heading.to_radians().sin();
+        let dy = distance * self.heading.to_radians().cos();
+        self.loc = Location::new(self.loc.x + dx, self.loc.y + dy, self.loc.z, t);
+        self.hl.push(self.loc.clone());
+        self.at = t;
     }
 }
 
@@ -225,7 +234,16 @@ impl Movable for Carrier {
         return true;
     }
     fn update_position(&mut self, t: chrono::NaiveDateTime) {
-
+        if self.at == t {
+            return;
+        }
+        let time: f64 = ((t - self.at).num_seconds() as f64) / (60.0 * 60.0);
+        let distance = self.speed * time;
+        let dx = distance * self.heading.to_radians().sin();
+        let dy = distance * self.heading.to_radians().cos();
+        self.loc = Location::new(self.loc.x + dx, self.loc.y + dy, self.loc.z, t);
+        self.hl.push(self.loc.clone());
+        self.at = t;
     }
 }
 

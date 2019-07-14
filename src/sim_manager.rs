@@ -142,7 +142,6 @@ impl SimManager {
 
 	    for line in buffered.lines().map(|l| l.unwrap()) {
 			if line.len() == 0 || line.starts_with("#") {
-				println!("Skipping line");
 				continue;
 			}
 			// println!("{:?}", line);
@@ -153,7 +152,7 @@ impl SimManager {
 			// for s in &tokens {
 			// 	println!("s: {}", s);
 			// }
-			println!("opcode: {:?}", &opcode);
+			// println!("opcode: {:?}", &opcode);
 
 			match opcode {
 				Opcode::StartSim => {

@@ -32,7 +32,7 @@ impl Location {
         Location::new(x, y, 0.0, t)
     }
     pub fn print(&self) {
-        println!("({}, {}, {}) t: {}", self.x, self.y, self.z, self.t);
+        println!("({:.2}, {:.2}, {:.2}) t: {}", self.x, self.y, self.z, self.t);
     }
     pub fn get_xyz(&self) -> (f64, f64, f64) {
         (self.x, self.y, self.z)
