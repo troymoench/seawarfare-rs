@@ -51,6 +51,16 @@ pub trait Movable {
     }
 }
 
+/// Calculate a new position using 'dead reckoning'
+fn calc_new_position(loc: Location, heading: f64, speed: f64, curr_tm: chrono::NaiveDateTime,
+                     prev_tm: chrono::NaiveDateTime) -> Location {
+     let time: f64 = ((curr_tm - prev_tm).num_seconds() as f64) / (60.0 * 60.0);
+     let distance = speed * time;
+     let dx = distance * heading.to_radians().sin();
+     let dy = distance * heading.to_radians().cos();
+     return Location::new(loc.x + dx, loc.y + dy, loc.z, curr_tm);
+}
+
 pub trait Ship {
     fn change(&self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool;
     fn update_position(&self, t: chrono::NaiveDateTime);
@@ -142,11 +152,7 @@ impl Movable for Cruiser {
         if self.at == t {
             return;
         }
-        let time: f64 = ((t - self.at).num_seconds() as f64) / (60.0 * 60.0);
-        let distance = self.speed * time;
-        let dx = distance * self.heading.to_radians().sin();
-        let dy = distance * self.heading.to_radians().cos();
-        self.loc = Location::new(self.loc.x + dx, self.loc.y + dy, self.loc.z, t);
+        self.loc = calc_new_position(self.loc.clone(), self.heading, self.speed, t, self.at);
         self.hl.push(self.loc.clone());
         self.at = t;
     }
@@ -237,11 +243,7 @@ impl Movable for Carrier {
         if self.at == t {
             return;
         }
-        let time: f64 = ((t - self.at).num_seconds() as f64) / (60.0 * 60.0);
-        let distance = self.speed * time;
-        let dx = distance * self.heading.to_radians().sin();
-        let dy = distance * self.heading.to_radians().cos();
-        self.loc = Location::new(self.loc.x + dx, self.loc.y + dy, self.loc.z, t);
+        self.loc = calc_new_position(self.loc.clone(), self.heading, self.speed, t, self.at);
         self.hl.push(self.loc.clone());
         self.at = t;
     }
