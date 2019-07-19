@@ -1,4 +1,4 @@
-use crate::location::Location;
+use crate::location::*;
 use crate::order::*;
 
 // class Movable {
@@ -39,7 +39,7 @@ pub trait Movable {
     fn get_history(&self) -> &HistoryList;
     fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool;
     fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool;
-    fn update_position(&mut self, t: chrono::NaiveDateTime);
+    fn update_position(&mut self, t: chrono::NaiveDateTime, loc_map: &LocationMap);
     fn execute(&mut self, order: &Order);
     fn print(&self) {
         println!("Name: {} ID: {}", self.get_name(), self.get_id());
@@ -139,7 +139,7 @@ impl Movable for Cruiser {
         return true;
     }
     fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
-        self.update_position(t);
+        // self.update_position(t);
         if head != -1.0 {
             self.heading = head;
         }
@@ -148,7 +148,7 @@ impl Movable for Cruiser {
         }
         return true;
     }
-    fn update_position(&mut self, t: chrono::NaiveDateTime) {
+    fn update_position(&mut self, t: chrono::NaiveDateTime, loc_map: &LocationMap) {
         if self.at == t {
             return;
         }
@@ -230,7 +230,7 @@ impl Movable for Carrier {
         return true;
     }
     fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
-        self.update_position(t);
+        // self.update_position(t);
         if head != -1.0 {
             self.heading = head;
         }
@@ -239,7 +239,7 @@ impl Movable for Carrier {
         }
         return true;
     }
-    fn update_position(&mut self, t: chrono::NaiveDateTime) {
+    fn update_position(&mut self, t: chrono::NaiveDateTime, loc_map: &LocationMap) {
         if self.at == t {
             return;
         }
@@ -305,9 +305,21 @@ impl Fighter {
 
     pub fn land(&mut self, ship_id: String, t:chrono::NaiveDateTime) -> bool {
         self.ship_id = ship_id;
-        self.update_position(t);
         self.is_landing = true;
         return true;
+    }
+
+    /// Determine if the fighter can land on a carrier
+    fn can_land(&self) -> bool {
+        let distance = self.loc.distance(&self.ship_loc);
+        return distance <= self.speed / 60.0;
+    }
+
+    /// Set the heading to the target carrier
+    fn goto_carrier(&mut self) {
+        let dx = self.ship_loc.x - self.loc.x;
+        let dy = self.ship_loc.y - self.loc.y;
+        self.heading = dy.atan2(dx).to_degrees();
     }
 }
 
@@ -336,7 +348,7 @@ impl Movable for Fighter {
         let result = match order {
             Order::DeployAircraftOrder(o) => self.deploy(o.heading, o.speed, o.altitude, o.extime),
             Order::ChangeAircraftOrder(o) => self.change(o.heading, o.speed, o.altitude, o.extime),
-            // Order::LandAircraftOrder(o) => self.land(o.ship_id, o.extime),
+            Order::LandAircraftOrder(o) => self.land(o.ship_id.clone(), o.extime),
             _ => false
         };
     }
@@ -344,7 +356,7 @@ impl Movable for Fighter {
         return false;
     }
     fn change(&mut self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool {
-        self.update_position(t);
+        // self.update_position(t);
         if spd != -1.0 {
             self.speed = spd;
         }
@@ -357,8 +369,23 @@ impl Movable for Fighter {
         }
         return true;
     }
-    fn update_position(&mut self, t: chrono::NaiveDateTime) {
+    fn update_position(&mut self, t: chrono::NaiveDateTime, loc_map: &LocationMap) {
+        self.ship_loc = loc_map.get(self.ship_id.as_str()).unwrap().clone();
+        self.loc = calc_new_position(self.loc.clone(), self.heading, self.speed, t, self.at);
+        self.loc.z = self.altitude;
+        self.hl.push(self.loc.clone());
+        self.at = t;
 
+        if self.is_landing {
+            if self.can_land() {
+                self.is_deployed = false;
+                self.is_landing = false;
+                self.altitude = 0.0;
+            }
+            else {
+                self.goto_carrier();
+            }
+        }
     }
 }
 

@@ -4,6 +4,7 @@ use std::io::{self, BufReader, BufRead};
 use chrono::Duration;
 use crate::order::*;
 use crate::movable::*;
+use crate::location::*;
 
 // typedef std::map<std::string, Movable*> NavyMap;
 // typedef std::deque<Order*> OrderQueue;
@@ -306,10 +307,12 @@ impl SimManager {
 			};
 			mov.execute(o);
 		}
+		let loc_map = self.get_location_map();
+
 		// update the position of all deployed movables
 		for (_, val) in self.navy_map.iter_mut() {
 			if val.get_is_deployed() {
-				val.update_position(now);
+				val.update_position(now, &loc_map);
 			}
 		}
 	}
@@ -323,5 +326,13 @@ impl SimManager {
 			t += Duration::seconds(60);
 		}
 		println!("sim completed");
+	}
+
+	fn get_location_map(&self) -> LocationMap {
+		let mut loc_map = LocationMap::new();
+		for (id, val) in self.navy_map.iter() {
+			loc_map.insert(id.clone(), val.get_location());
+		}
+		return loc_map;
 	}
 }

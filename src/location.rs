@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /*
 class Location {
 public:
@@ -15,6 +17,8 @@ private:
 	ATime t;
 };
 */
+
+pub type LocationMap = HashMap<String, Location>;
 
 #[derive(Debug)]
 pub struct Location {
@@ -36,6 +40,14 @@ impl Location {
     }
     pub fn get_xyz(&self) -> (f64, f64, f64) {
         (self.x, self.y, self.z)
+    }
+
+    /// Calculate the 2D distance between two locations
+    /// using the Pythagorean Theorem
+    pub fn distance(&self, other: &Location) -> f64 {
+        let dx = self.x - other.x;
+        let dy = self.y - other.y;
+        return (dx.powi(2) + dy.powi(2)).sqrt();
     }
 }
 
