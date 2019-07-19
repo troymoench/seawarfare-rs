@@ -1,32 +1,6 @@
 use crate::location::*;
 use crate::order::*;
 
-// class Movable {
-// public:
-// 	Movable();
-// 	Movable(std::string, std::string, double);
-// 	virtual void updatePosition(ATime) = 0;   // make this pure virtual
-// 	bool isDeployed() const { return isdeployed; }
-// 	bool wasDeployed() const { return wasdeployed; }
-// 	HistoryList* getHistory();
-// 	Location getlocation(); //makes location available (for aircraft to land)
-// 	void print();
-// 	void printHL();
-// 	bool deploy(double, double, double, double, ATime);
-// 	virtual bool change(double, double, double, ATime) = 0;
-// protected:
-// 	ATime at;
-// 	Location loc;
-// 	bool isdeployed;
-// 	bool wasdeployed;
-// 	double heading;
-// 	double speed;
-// 	double max_speed;
-// 	std::string name;
-// 	std::string ID;
-// 	HistoryList hl;
-// 	void update(ATime);
-// };
 
 type HistoryList = Vec<Location>;
 

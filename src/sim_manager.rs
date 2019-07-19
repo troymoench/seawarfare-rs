@@ -6,25 +6,6 @@ use crate::order::*;
 use crate::movable::*;
 use crate::location::*;
 
-// typedef std::map<std::string, Movable*> NavyMap;
-// typedef std::deque<Order*> OrderQueue;
-//
-// class SimulationMgr {
-// public:
-// 	bool simInit(std::string orderFile);
-// 	void simDoUpdate(ATime);
-// 	ATime getStart() const { return start; }
-// 	ATime getStop() const { return stop; }
-// 	NavyMap* getNavy() { return &nm; }
-// 	void printOrders();
-// 	void printNavy();
-// 	void printHistList();
-// private:
-// 	ATime start;
-// 	ATime stop;
-// 	NavyMap nm;
-// 	OrderQueue oq;
-// };
 
 type OrderQueue = Vec<Box<Order>>;
 type NavyMap = HashMap<String, Box<Movable>>;

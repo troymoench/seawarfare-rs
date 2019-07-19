@@ -1,22 +1,5 @@
 use std::cmp::Ordering;
 
-// class Order {
-// public:
-// 	Order();
-// 	Order(ATime, std::string);
-// 	bool operator==(const Order& o) const;
-// 	bool operator<(const Order& o) const;
-// 	bool operator>(const Order& o) const;
-// 	bool operator!=(const Order& o) const;
-// 	ATime exectime() const { return extime; }
-// 	std::string get_id() const { return ID; }
-// 	virtual bool Execute(Movable*, ATime) = 0;  // make pure virtual
-// 	void print();
-// protected:
-// 	std::string Name;
-// 	std::string ID;
-// 	ATime extime;
-// };
 
 pub enum Order {
     DeployShipOrder(DeployShip),
