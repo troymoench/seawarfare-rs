@@ -110,6 +110,8 @@ impl SimManager {
 		// open the file and read line by line
 		// if the line starts with a # or is blank, skip
 
+        let DATETIME_FORMAT = "%m/%d/%Y %H:%M:%S";
+
 		// open the file. If it fails to open, complain and return false
 		let f = File::open(filename);
 		let f = match f {
@@ -122,10 +124,9 @@ impl SimManager {
 
 	    let buffered = BufReader::new(f);
 
-	    for line in buffered.lines().map(|l| l.unwrap()) {
-			if line.len() == 0 || line.starts_with("#") {
-				continue;
-			}
+	    for line in buffered.lines()
+                    .map(|l| l.unwrap())
+                    .filter(|l| l.len() != 0 && !l.starts_with("#")) {
 			// println!("{:?}", line);
 
 			// split line on whitespace
@@ -140,7 +141,7 @@ impl SimManager {
 				Opcode::StartSim => {
 					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
 					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																	   "%m/%d/%Y %H:%M:%S");
+																	   DATETIME_FORMAT);
 					match parsed {
 						Ok(dt) => self.start = dt,
 						Err(_error) => return false
@@ -149,7 +150,7 @@ impl SimManager {
 				Opcode::StopSim | Opcode::EndSim => {
 					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
 					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																	   "%m/%d/%Y %H:%M:%S");
+																	   DATETIME_FORMAT);
 					match parsed {
 						Ok(dt) => self.stop = dt,
 						Err(_error) => return false
@@ -187,7 +188,7 @@ impl SimManager {
 				Opcode::DeployShip => {
 					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
 					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																	   "%m/%d/%Y %H:%M:%S");
+																	   DATETIME_FORMAT);
 					let atm = match parsed {
 						Ok(dt) => dt,
 						Err(_error) => return false
@@ -204,7 +205,7 @@ impl SimManager {
 				Opcode::DeployAircraft => {
 					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
 					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																	   "%m/%d/%Y %H:%M:%S");
+																	   DATETIME_FORMAT);
 					let atm = match parsed {
 						Ok(dt) => dt,
 						Err(_error) => return false
@@ -220,7 +221,7 @@ impl SimManager {
 				Opcode::ChangeShipOrders => {
 					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
 					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																	   "%m/%d/%Y %H:%M:%S");
+																	   DATETIME_FORMAT);
 					let atm = match parsed {
 						Ok(dt) => dt,
 						Err(_error) => return false
@@ -235,7 +236,7 @@ impl SimManager {
 				Opcode::ChangeAircraftOrders => {
 					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
 					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																	   "%m/%d/%Y %H:%M:%S");
+																	   DATETIME_FORMAT);
 					let atm = match parsed {
 						Ok(dt) => dt,
 						Err(_error) => return false
@@ -251,7 +252,7 @@ impl SimManager {
 				Opcode::LandAircraft => {
 					let date_time_str = format!("{} {}", tokens[0], tokens[1]);
 					let parsed = chrono::NaiveDateTime::parse_from_str(date_time_str.as_str(),
-																	   "%m/%d/%Y %H:%M:%S");
+																	   DATETIME_FORMAT);
 					let atm = match parsed {
 						Ok(dt) => dt,
 						Err(_error) => return false
