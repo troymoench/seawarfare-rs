@@ -1,7 +1,6 @@
 use crate::location::*;
 use crate::order::*;
 
-
 type HistoryList = Vec<Location>;
 
 pub trait Movable {
@@ -26,20 +25,24 @@ pub trait Movable {
 }
 
 /// Calculate a new position using 'dead reckoning'
-fn calc_new_position(loc: Location, heading: f64, speed: f64, curr_tm: chrono::NaiveDateTime,
-                     prev_tm: chrono::NaiveDateTime) -> Location {
-     let time: f64 = ((curr_tm - prev_tm).num_seconds() as f64) / (60.0 * 60.0);
-     let distance = speed * time;
-     let dx = distance * heading.to_radians().sin();
-     let dy = distance * heading.to_radians().cos();
-     return Location::new(loc.x + dx, loc.y + dy, loc.z, curr_tm);
+fn calc_new_position(
+    loc: Location,
+    heading: f64,
+    speed: f64,
+    curr_tm: chrono::NaiveDateTime,
+    prev_tm: chrono::NaiveDateTime,
+) -> Location {
+    let time: f64 = ((curr_tm - prev_tm).num_seconds() as f64) / (60.0 * 60.0);
+    let distance = speed * time;
+    let dx = distance * heading.to_radians().sin();
+    let dy = distance * heading.to_radians().cos();
+    return Location::new(loc.x + dx, loc.y + dy, loc.z, curr_tm);
 }
 
 pub trait Ship {
     fn change(&self, head: f64, spd: f64, alt: f64, t: chrono::NaiveDateTime) -> bool;
     fn update_position(&self, t: chrono::NaiveDateTime);
 }
-
 
 #[derive(Debug)]
 pub struct Cruiser {
@@ -53,7 +56,7 @@ pub struct Cruiser {
     speed: f64,
     max_speed: f64,
     hl: HistoryList,
-    max_missles: i64
+    max_missles: i64,
 }
 
 impl Cruiser {
@@ -69,7 +72,7 @@ impl Cruiser {
             speed: 0.0,
             max_speed: max_speed,
             hl: HistoryList::new(),
-            max_missles: 0
+            max_missles: 0,
         }
     }
 }
@@ -97,9 +100,11 @@ impl Movable for Cruiser {
     /// and call the function associated with it
     fn execute(&mut self, order: &Order) {
         let result = match order {
-            Order::DeployShipOrder(o) => self.deploy(o.start_x, o.start_y, o.heading, o.speed, o.extime),
+            Order::DeployShipOrder(o) => {
+                self.deploy(o.start_x, o.start_y, o.heading, o.speed, o.extime)
+            }
             Order::ChangeShipOrder(o) => self.change(o.heading, o.speed, 0.0, o.extime),
-            _ => false
+            _ => false,
         };
     }
     fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
@@ -144,7 +149,7 @@ pub struct Carrier {
     speed: f64,
     max_speed: f64,
     hl: HistoryList,
-    max_aircraft: i64
+    max_aircraft: i64,
 }
 
 impl Carrier {
@@ -160,7 +165,7 @@ impl Carrier {
             speed: 0.0,
             max_speed: max_speed,
             hl: HistoryList::new(),
-            max_aircraft: max_aircraft
+            max_aircraft: max_aircraft,
         }
     }
 }
@@ -188,9 +193,11 @@ impl Movable for Carrier {
     /// and call the function associated with it
     fn execute(&mut self, order: &Order) {
         let result = match order {
-            Order::DeployShipOrder(o) => self.deploy(o.start_x, o.start_y, o.heading, o.speed, o.extime),
+            Order::DeployShipOrder(o) => {
+                self.deploy(o.start_x, o.start_y, o.heading, o.speed, o.extime)
+            }
             Order::ChangeShipOrder(o) => self.change(o.heading, o.speed, 0.0, o.extime),
-            _ => false
+            _ => false,
         };
     }
     fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
@@ -236,15 +243,22 @@ pub struct Fighter {
     max_speed: f64,
     hl: HistoryList,
     is_landing: bool,
-	ship_id: String,
+    ship_id: String,
     ship_loc: Location,
-	max_ceiling: f64,
-	altitude: f64,
-	max_bombs: i64
+    max_ceiling: f64,
+    altitude: f64,
+    max_bombs: i64,
 }
 
 impl Fighter {
-    pub fn new(name: String, id: String, max_speed: f64, ship_id: String, max_ceiling: f64, max_bombs: i64) -> Self {
+    pub fn new(
+        name: String,
+        id: String,
+        max_speed: f64,
+        ship_id: String,
+        max_ceiling: f64,
+        max_bombs: i64,
+    ) -> Self {
         Fighter {
             name: name,
             id: id,
@@ -261,7 +275,7 @@ impl Fighter {
             ship_loc: Location::default(),
             max_ceiling: max_ceiling,
             altitude: 0.0,
-            max_bombs: max_bombs
+            max_bombs: max_bombs,
         }
     }
 
@@ -277,7 +291,7 @@ impl Fighter {
         return true;
     }
 
-    pub fn land(&mut self, ship_id: String, t:chrono::NaiveDateTime) -> bool {
+    pub fn land(&mut self, ship_id: String, t: chrono::NaiveDateTime) -> bool {
         self.ship_id = ship_id;
         self.is_landing = true;
         return true;
@@ -323,7 +337,7 @@ impl Movable for Fighter {
             Order::DeployAircraftOrder(o) => self.deploy(o.heading, o.speed, o.altitude, o.extime),
             Order::ChangeAircraftOrder(o) => self.change(o.heading, o.speed, o.altitude, o.extime),
             Order::LandAircraftOrder(o) => self.land(o.ship_id.clone(), o.extime),
-            _ => false
+            _ => false,
         };
     }
     fn deploy(&mut self, x: f64, y: f64, head: f64, spd: f64, t: chrono::NaiveDateTime) -> bool {
@@ -355,8 +369,7 @@ impl Movable for Fighter {
                 self.is_deployed = false;
                 self.is_landing = false;
                 self.altitude = 0.0;
-            }
-            else {
+            } else {
                 self.goto_carrier();
             }
         }
@@ -381,13 +394,25 @@ mod tests {
 
     #[test]
     fn test_fighter_new() {
-        let a = Fighter::new(String::from("Brunhilde"), String::from("G264"), 500.0, String::from("P131"), 100000.0, 20);
+        let a = Fighter::new(
+            String::from("Brunhilde"),
+            String::from("G264"),
+            500.0,
+            String::from("P131"),
+            100000.0,
+            20,
+        );
         a.print();
     }
 
     #[test]
     fn test_execute_order() {
-        let mut a = Box::new(Cruiser::new(String::from("Chelsey"), String::from("I264"), 12.0, 30));
+        let mut a = Box::new(Cruiser::new(
+            String::from("Chelsey"),
+            String::from("I264"),
+            12.0,
+            30,
+        ));
         a.print();
         let atime = chrono::NaiveDate::from_ymd(2015, 10, 21).and_hms(17, 2, 0);
         let op = DeployShip::new(atime, String::from("CGN-39"), 0.0, 0.0, 0.0, 0.0);

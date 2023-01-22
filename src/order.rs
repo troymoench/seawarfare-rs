@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 
-
 pub enum Order {
     DeployShipOrder(DeployShip),
     DeployAircraftOrder(DeployAircraft),
@@ -20,7 +19,7 @@ impl Order {
         }
     }
 
-    pub fn get_extime(&self) -> chrono::NaiveDateTime{
+    pub fn get_extime(&self) -> chrono::NaiveDateTime {
         match self {
             Order::DeployShipOrder(o) => o.get_extime(),
             Order::DeployAircraftOrder(o) => o.get_extime(),
@@ -72,7 +71,7 @@ pub struct DeployShip {
     pub start_x: f64,
     pub start_y: f64,
     pub heading: f64,
-    pub speed: f64
+    pub speed: f64,
 }
 
 impl DeployShip {
@@ -83,16 +82,16 @@ impl DeployShip {
             start_x: x,
             start_y: y,
             heading: head,
-            speed: spd
+            speed: spd,
         }
     }
 
     pub fn get_id(&self) -> String {
-        return self.id.clone()
+        return self.id.clone();
     }
 
     pub fn get_extime(&self) -> chrono::NaiveDateTime {
-        return self.extime.clone()
+        return self.extime.clone();
     }
 
     pub fn print(&self) {
@@ -106,7 +105,7 @@ pub struct DeployAircraft {
     pub extime: chrono::NaiveDateTime,
     pub heading: f64,
     pub speed: f64,
-    pub altitude: f64
+    pub altitude: f64,
 }
 
 impl DeployAircraft {
@@ -116,16 +115,16 @@ impl DeployAircraft {
             id: id,
             heading: head,
             speed: spd,
-            altitude: alt
+            altitude: alt,
         }
     }
 
     pub fn get_id(&self) -> String {
-        return self.id.clone()
+        return self.id.clone();
     }
 
     pub fn get_extime(&self) -> chrono::NaiveDateTime {
-        return self.extime.clone()
+        return self.extime.clone();
     }
 
     pub fn print(&self) {
@@ -152,11 +151,11 @@ impl ChangeShip {
     }
 
     pub fn get_id(&self) -> String {
-        return self.id.clone()
+        return self.id.clone();
     }
 
     pub fn get_extime(&self) -> chrono::NaiveDateTime {
-        return self.extime.clone()
+        return self.extime.clone();
     }
 
     pub fn print(&self) {
@@ -170,7 +169,7 @@ pub struct ChangeAircraft {
     pub extime: chrono::NaiveDateTime,
     pub heading: f64,
     pub speed: f64,
-    pub altitude: f64
+    pub altitude: f64,
 }
 
 impl ChangeAircraft {
@@ -180,16 +179,16 @@ impl ChangeAircraft {
             id: id,
             heading: head,
             speed: spd,
-            altitude: alt
+            altitude: alt,
         }
     }
 
     pub fn get_id(&self) -> String {
-        return self.id.clone()
+        return self.id.clone();
     }
 
     pub fn get_extime(&self) -> chrono::NaiveDateTime {
-        return self.extime.clone()
+        return self.extime.clone();
     }
 
     pub fn print(&self) {
@@ -201,7 +200,7 @@ impl ChangeAircraft {
 pub struct LandAircraft {
     pub id: String,
     pub extime: chrono::NaiveDateTime,
-    pub ship_id: String
+    pub ship_id: String,
 }
 
 impl LandAircraft {
@@ -209,23 +208,22 @@ impl LandAircraft {
         LandAircraft {
             extime: a,
             id: id,
-            ship_id: ship_id
+            ship_id: ship_id,
         }
     }
 
     pub fn get_id(&self) -> String {
-        return self.id.clone()
+        return self.id.clone();
     }
 
     pub fn get_extime(&self) -> chrono::NaiveDateTime {
-        return self.extime.clone()
+        return self.extime.clone();
     }
 
     pub fn print(&self) {
         println!("id: {} extime: {}", self.id, self.extime)
     }
 }
-
 
 #[cfg(test)]
 mod tests {

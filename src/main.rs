@@ -3,7 +3,6 @@ use seawarfare_rs::sim_manager::*;
 use std::env;
 extern crate chrono;
 
-
 fn main() {
     let args: Vec<String> = env::args().collect();
 

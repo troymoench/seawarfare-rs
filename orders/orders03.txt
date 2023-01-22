@@ -1,6 +1,6 @@
 # Create the objects
 # http://www.navysite.de/nframes.htm
-# 
+#
 # http://www.navysite.de/carriers.htm
 # CreateAirCraftCarrier USS_Nimitz CVN-68 85 4 50
 # http://www.navysite.de/cruisers.htm
